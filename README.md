@@ -3,9 +3,11 @@
 
 If you're here looking for quick answers and don't care about reading, take a look at `stoat-configs`.
 
-If you want an ansible example check out 
+If you want an ansible example check out `ansible-example-role`.
 
 # Self hosting [stoat](https://stoat.chat) with voice and video support
+
+<!-- toc -->
 
 Stoat is currently in a transitionary period, therefore the
 documentation for self hosting with voice and video support
@@ -14,17 +16,32 @@ been made to enable the features.
 
 There is also no official docker image for the web front end yet.
 
-We'll be using the image graciously provided by [baptisterajaut](https://github.com/baptisterajaut).
+We'll be using the image graciously provided by [baptisterajaut](https://github.com/baptisterajaut) which uses
+the fork by [LordGuenni](https://github.com/LordGuenni/for-web)
 
 ## Issues and PRs to keep track of voice and video progress
 
 - [#176](https://github.com/stoatchat/self-hosted/issues/176) - Seems to be the main discussion thread right now.
+- [#313](https://github.com/stoatchat/stoatchat/issues/313) - Progress tracker for voice/video.
 - [PR for dockerizing web front end](https://github.com/Flash1232/for-web/pull/3)
 
-## Notable repos
+## Quick Reference: Credentials to Generate
 
-- [The forked front end with voice and video enabled](https://github.com/LordGuenni/for-web)
+Before deploying, generate these credentials. All values marked `CHANGE_ME_*` in config files must be replaced.
 
+| Credential | Used In | How to Generate |
+|------------|---------|-----------------|
+| **LiveKit API Key & Secret** | Revolt.toml, livekit.yaml, compose | `docker run --rm livekit/generate --local` |
+| **MinIO User & Password** | Revolt.toml (`access_key_id`/`secret_access_key`), compose | `openssl rand -hex 24` |
+| **RabbitMQ Password** | Revolt.toml, compose | `openssl rand -hex 24` |
+| **File Encryption Key** | Revolt.toml (`files.encryption_key`) | `openssl rand -base64 32` |
+| **VAPID Keys** | Revolt.toml (`pushd.vapid`) | Not sure tbh. If you know please make a PR |
+
+### Generating LiveKit Keys
+
+```bash
+docker run --rm livekit/generate --local
+```
 
 ## Architecture Overview
 
@@ -76,14 +93,38 @@ VITE_WS_URL        - WebSocket endpoint
 VITE_MEDIA_URL     - File server (Autumn)
 VITE_PROXY_URL     - Metadata proxy (January)
 ```
+## Docker Networking
 
-## LiveKit Voice/Video - The Non-Obvious Stuff
+All Stoat containers **must** be on the same Docker network. This is how services find each other.
+
+Docker provides internal DNS resolution - when containers are on the same network, they can reach each other by container name. This is why the configs use hostnames like `stoat-database`, `stoat-redis`, `stoat-api`, etc. Docker resolves these names to the container's internal IP.
+
+For example, in `Revolt.toml`:
+```toml
+[database]
+mongodb = "mongodb://stoat-database"  # Resolves via Docker DNS
+redis = "redis://stoat-redis/"
+```
+
+If services can't find each other, the first thing to check is network membership:
+```bash
+docker network inspect stoat_network
+```
+
+All 14 containers should be listed. If something's missing, it won't be able to resolve other container names.
+
+
+## Voice/Video - The Non-Obvious Stuff
 
 Getting voice and video working required the most debugging. Here's what you need to know:
 
+## LiveKit
+
+Stoat moved to using [LiveKit](https://livekit.io/) to handle voice and video streams. We just use the official livekit image in our setup.
+
 ### The Patched Web Client
 
-The standard Stoat/Revolt web client **does not include voice/video support**. The LiveKit integration exists in the backend, but the official web client doesn't have the UI for it.
+The standard Stoat/Revolt web client **does not include voice/video support**. The LiveKit integration exists in the backend, but the official web client doesn't have the UI for it (yet).
 
 `baptisterajaut/stoatchat-web:dev` is a community-patched image that adds the voice/video UI. Without this, you'll have a working LiveKit server that nothing can connect to.
 
@@ -160,6 +201,10 @@ Health checks matter here. MongoDB and RabbitMQ have health checks that other se
 
 ## Common Gotchas
 
+### EMPTY CACHE AND HARD RELOAD
+
+Many times during debugging I chased red herrings, when all I had to do was empty cache and hard reload on my browser.
+
 ### "missing field `lat`" Panic
 Add `lat = 0.0` and `lon = 0.0` to your `[api.livekit.nodes.*]` config. See LiveKit section above.
 
@@ -200,26 +245,6 @@ For reference, these are the ports services listen on inside the Docker network:
 
 You shouldn't need to expose these externally - Caddy proxies everything through a single port.
 
-## Docker Networking
-
-All Stoat containers **must** be on the same Docker network. This is how services find each other.
-
-Docker provides internal DNS resolution - when containers are on the same network, they can reach each other by container name. This is why the configs use hostnames like `stoat-database`, `stoat-redis`, `stoat-api`, etc. Docker resolves these names to the container's internal IP.
-
-For example, in `Revolt.toml`:
-```toml
-[database]
-mongodb = "mongodb://stoat-database"  # Resolves via Docker DNS
-redis = "redis://stoat-redis/"
-```
-
-If services can't find each other, the first thing to check is network membership:
-```bash
-docker network inspect stoat_network
-```
-
-All 14 containers should be listed. If something's missing, it won't be able to resolve other container names.
-
 ## The Caddy Configuration
 
 Caddy acts as the single entry point, routing requests to the correct backend service based on URL path. Here's what each route does:
@@ -252,22 +277,7 @@ Two paths require WebSocket upgrades:
 - `/ws` - Real-time events
 - `/livekit/*` - Voice/video signaling
 
-Make sure your proxy handles these. For nginx:
-```nginx
-location /ws {
-    proxy_pass http://stoat-events:14703/;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-}
-
-location /livekit/ {
-    proxy_pass http://stoat-livekit-server:7880/;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-}
-```
+Make sure your proxy can handle this.
 
 ### Route Summary
 

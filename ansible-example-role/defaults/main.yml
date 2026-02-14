@@ -1,12 +1,30 @@
 stoat_domain: "chat.example.com"
 stoat_external_port: 9009
 
-minio_root_user: minioautumn
-minio_root_password: minioautumn
-rabbitmq_user: rabbituser
-rabbitmq_pass: rabbitpass
+# MinIO credentials - use strong random passwords
+# Generate with: openssl rand -hex 24
+minio_root_user: "CHANGE_ME_minio_user"
+minio_root_password: "CHANGE_ME_minio_password"
+
+# RabbitMQ credentials
+# Generate with: openssl rand -hex 24
+rabbitmq_user: "CHANGE_ME_rabbit_user"
+rabbitmq_pass: "CHANGE_ME_rabbit_password"
 
 revolt_image_tag: "20250930-2"
 
 docker_network: stoat_network
-stoat_file_encryption_key: "my secret key"
+
+# File encryption key - MUST be unique per deployment
+# Generate with: openssl rand -base64 32
+stoat_file_encryption_key: "CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_32"
+
+# LiveKit credentials - generate using livekit/generate docker image
+# docker run --rm livekit/generate --local
+livekit_api_key: "CHANGE_ME_livekit_key"
+livekit_api_secret: "CHANGE_ME_livekit_secret"
+
+# VAPID keys for web push notifications
+# Generate with: npx web-push generate-vapid-keys
+vapid_private_key: "CHANGE_ME_vapid_private"
+vapid_public_key: "CHANGE_ME_vapid_public"

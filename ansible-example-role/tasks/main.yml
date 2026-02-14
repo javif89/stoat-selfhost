@@ -162,11 +162,21 @@
     command:
       - --disable-strict-config
     env:
-      LIVEKIT_CONFIG: "keys:\n  43e2a23b5f91: 4823d8b08d6d1db95d8d61f6b304e71294e2576234fef9a760\n\
-        log_level: info\nport: 7880\nredis:\n  address: stoat-redis:6379\n  password:\
-        \ d99c08fa858d5790387974bbf6cb246aa751b39a4894d7c986\nrtc:\n  port_range_end:\
-        \ 50100\n  port_range_start: 50000\n  tcp_port: 7881\n  use_external_ip: false\n\
-        turn:\n  enabled: false\n  loadBalancerAnnotations: {}\n"
+      # Generate LiveKit keys with: docker run --rm livekit/generate --local
+      LIVEKIT_CONFIG: |
+        keys:
+          {{ livekit_api_key }}: {{ livekit_api_secret }}
+        log_level: info
+        port: 7880
+        redis:
+          address: stoat-redis:6379
+        rtc:
+          port_range_end: 50100
+          port_range_start: 50000
+          tcp_port: 7881
+          use_external_ip: false
+        turn:
+          enabled: false
     restart_policy: always
     networks:
       - name: "{{ docker_network }}"

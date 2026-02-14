@@ -2,11 +2,13 @@
 # This is passed via LIVEKIT_CONFIG environment variable in compose.yml
 # You can also mount this file and use: livekit-server --config /path/to/livekit.yaml
 
-# API keys - generate your own:
+# API keys - generate your own using the livekit/generate image:
+#   docker run --rm livekit/generate --local
+# Or manually:
 #   Key: openssl rand -hex 6
 #   Secret: openssl rand -hex 25
 keys:
-  43e2a23b5f91: 4823d8b08d6d1db95d8d61f6b304e71294e2576234fef9a760
+  CHANGE_ME_API_KEY: CHANGE_ME_API_SECRET
 
 log_level: info
 

@@ -74,12 +74,13 @@ call_ring_duration = 30
 
 # IMPORTANT: Node name must match the key in [hosts.livekit]
 # lat and lon are REQUIRED (can be 0.0 for single-node deployments)
+# Generate keys with: docker run --rm livekit/generate --local
 [api.livekit.nodes.worldwide]
 url = "http://stoat-livekit-server:7880"
 lat = 0.0
 lon = 0.0
-key = "43e2a23b5f91"
-secret = "4823d8b08d6d1db95d8d61f6b304e71294e2576234fef9a760"
+key = "CHANGE_ME_LIVEKIT_API_KEY"
+secret = "CHANGE_ME_LIVEKIT_API_SECRET"
 
 [api.users]
 

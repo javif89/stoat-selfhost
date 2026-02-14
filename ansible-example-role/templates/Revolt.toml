@@ -75,8 +75,8 @@ call_ring_duration = 30
 url = "http://stoat-livekit-server:7880"
 lat = 0.0
 lon = 0.0
-key = "43e2a23b5f91"
-secret = "4823d8b08d6d1db95d8d61f6b304e71294e2576234fef9a760"
+key = "{{ livekit_api_key }}"
+secret = "{{ livekit_api_secret }}"
 
 [api.users]
 
@@ -102,8 +102,9 @@ ack_queue = "notifications.process.ack"                  # updates badges for ap
 
 
 [pushd.vapid]
-private_key = "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUJ5cE9TQjdRcUhQbHkvc0hhczlIT2R4cTd5MVcvU1duZHB5SUtGRGtIM1NvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFdWxtSUZEVVJ3dlhYWTZPdDE3SklDQVpJZGRoVXVEOUl3b2pGaExIbnhteUU5WGJLQ1IzdApXckFPOGNXWkloQU9zaVB5WTFuNnN1YWljbEQ3a2tOa2pnPT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo"
-public_key = "BLpZiBQ1EcL112OjrdeySAgGSHXYVLg_SMKIxYSx58ZshPV2ygkd7VqwDvHFmSIQDrIj8mNZ-rLmonJQ-5JDZI4"
+# Generate with: npx web-push generate-vapid-keys
+private_key = "{{ vapid_private_key }}"
+public_key = "{{ vapid_public_key }}"
 queue = "notifications.outbound.vapid"
 
 [pushd.fcm]
@@ -177,10 +178,10 @@ endpoint = "http://minio:9000"
 path_style_buckets = false
 # S3 region name
 region = "minio"
-# S3 protocol key ID
-access_key_id = "minioautumn"
-# S3 protocol access key
-secret_access_key = "minioautumn"
+# S3 protocol key ID - must match MINIO_ROOT_USER
+access_key_id = "{{ minio_root_user }}"
+# S3 protocol access key - must match MINIO_ROOT_PASSWORD
+secret_access_key = "{{ minio_root_password }}"
 default_bucket = "revolt-uploads"
 
 
