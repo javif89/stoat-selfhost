@@ -61,11 +61,11 @@ Before deploying, generate these credentials. All values marked `CHANGE_ME_*` in
 
 | Credential | Used In | How to Generate |
 |------------|---------|-----------------|
-| **LiveKit API Key & Secret** | Revolt.toml, livekit.yaml, compose | `docker run --rm livekit/generate --local` |
+| **LiveKit API Key & Secret** | Revolt.toml, livekit.yaml, compose | `docker run --rm --tmpfs /output livekit/generate --local` |
 | **MinIO User & Password** | Revolt.toml (`access_key_id`/`secret_access_key`), compose | `openssl rand -hex 24` |
 | **RabbitMQ Password** | Revolt.toml, compose | `openssl rand -hex 24` |
 | **File Encryption Key** | Revolt.toml (`files.encryption_key`) | `openssl rand -base64 32` |
-| **VAPID Keys** | Revolt.toml (`pushd.vapid`) | Not sure tbh. If you know please make a PR |
+| **VAPID Keys** | Revolt.toml (`pushd.vapid`) | `KEY_PEM=$(openssl ecparam -genkey -name prime256v1 -noout) && for OPTION in "" -pubout; do openssl ec -in <(echo "${KEY_PEM}") ${OPTION}; done` |
 
 ### Generating LiveKit Keys
 
