@@ -154,9 +154,9 @@ Stoat moved to using [LiveKit](https://livekit.io/) to handle voice and video st
 
 ### The Patched Web Client
 
-The standard Stoat/Revolt web client **does not include voice/video support**. The LiveKit integration exists in the backend, but the official web client doesn't have the UI for it (yet).
+The standard Stoat/Revolt web client **does not include video support**. The LiveKit integration exists in the backend, but the official web client disables the video buttons.
 
-`baptisterajaut/stoatchat-web:dev` is a community-patched image that adds the voice/video UI. Without this, you'll have a working LiveKit server that nothing can connect to.
+`baptisterajaut/stoatchat-web:dev` is a community-patched image that adds the video UI.
 
 ### Node Configuration: The lat/lon Requirement
 
@@ -216,6 +216,8 @@ Why? MinIO supports virtual-host style bucket addressing where `bucketname.minio
 Without these aliases, file uploads will fail with connection errors because `avatars.minio` won't resolve to anything.
 
 The actual bucket created is just `revolt-uploads` - the aliases are for routing, not for creating separate buckets.
+
+Note : you can also set `path_style_buckets` to false : https://github.com/stoatchat/stoatchat/blob/74f0c537e6689bcdb642f78c484a98b9b22f9ec7/crates/core/config/Revolt.toml#L186
 
 ## Service Dependencies
 
