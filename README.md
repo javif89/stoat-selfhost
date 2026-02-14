@@ -53,6 +53,7 @@ the fork by [LordGuenni](https://github.com/LordGuenni/for-web)
 - [#176](https://github.com/stoatchat/self-hosted/issues/176) - Seems to be the main discussion thread right now.
 - [#313](https://github.com/stoatchat/stoatchat/issues/313) - Progress tracker for voice/video.
 - [PR for dockerizing web front end](https://github.com/Flash1232/for-web/pull/3)
+- [PR to the official self hosted guide for setting up livekit](https://github.com/Flash1232/self-hosted/pull/2)
 
 ## Quick Reference: Credentials to Generate
 
